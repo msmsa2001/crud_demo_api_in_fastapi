@@ -4,96 +4,87 @@ from pydantic import BaseModel
 from typing import Optional,List
 from database import SessionLocal
 import models 
+import schema
 
 app=FastAPI()
 
-class Item(BaseModel):
-    id:int
-    name:str
-    description:str
-    amount:int
-    on_offer:bool
-
-    class Config:
-        orm_mode=True
-
-
 db=SessionLocal()
 
-@app.get('/items',response_model=List[Item],status_code=200)
-def get_all_items():
-    items=db.query(models.Item).all()
-
-    return items
 
 
-@app.get('/item/{item_id}',response_model=Item,status_code=status.HTTP_200_OK)
-def get_an_item(item_id:int):
-    item=db.query(models.Item).filter(models.Item.id==item_id).first()
+# @app.get('/items',response_model=List[schema.Item],status_code=200)
+# def get_all_items():
+#     items=db.query(models.Item).all()
 
-    return item
+#     return items
 
-@app.post('/items',response_model=Item,status_code=status.HTTP_201_CREATED)
-def create_an_item(item:Item):
-    db_item=db.query(models.Item).filter(models.Item.name==item.name).first()
+
+# @app.get('/item/{item_id}',response_model=schema.Item,status_code=status.HTTP_200_OK)
+# def get_an_item(item_id:int):
+#     item=db.query(models.Item).filter(models.Item.id==item_id).first()
+
+#     return item
+
+@app.post('/items',response_model=schema.SignUp,status_code=status.HTTP_201_CREATED)
+def register_an_user(item:schema.SignUp):
+    db_New_user=db.query(models.SignUp).filter(models.SignUp.email==item.email or models.SignUp.mobnumber==item.mobnumber).first()
     
-    if db_item is not None:
+    if db_New_user is not None:
         raise HTTPException(status_code=400,detail="Data Already Present")
     
-    new_item=models.Item(
+    new_user=models.SignUp(
         name=item.name,
-        description=item.description,
-        amount=item.amount,
-        on_offer=item.on_offer
+        email=item.email,
+        mobnumber=item.mobnumber,
+        password=item.password
     )
-    db.add(new_item)
+    db.add(new_user)
     db.commit()
 
-    return new_item
+    return new_user
+
+@app.post('/item',response_model=schema.SignUp,status_code=status.HTTP_202_ACCEPTED)
+def login_an_user(item:schema.SignUp):
+    db_check=db.query(models.SignUp).filter(models.SignUp.email==item.email and models.SignUp.password==item.password)
+    print(db_check)
+
+    if db_check is not None:
+        print('Successfull')
+        # raise HTTPException(status_code=400,detail="login done")
+    else:
+        print('Invalid')
+        # raise HTTPException(status_code=400,detail="Login Done")
 
 
-@app.put('/item/{item_id}',response_model=Item,status_code=status.HTTP_200_OK)
-def update_an_item(item_id:int,item:Item):
-    item_to_update=db.query(models.Item).filter(models.Item.id==item_id).first()
-    item_to_update.name=item.name,
-    item_to_update.description=item.description,
-    item_to_update.amount=item.amount,
-    item_to_update.on_offer=item.on_offer
 
-    db.commit()
 
-    return item_to_update    
 
-@app.delete('/item/{item_id}')
-def delete_item(item_id:int):
-    item_to_delete=db.query(models.Item).filter(models.Item.id==item_id).first()
 
-    if item_to_delete is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail="Record is not Found")
+
+# @app.put('/item/{item_id}',response_model=schema.Item,status_code=status.HTTP_200_OK)
+# def update_an_item(item_id:int,item:schema.Item):
+#     item_to_update=db.query(models.Item).filter(models.Item.id==item_id).first()
+#     item_to_update.name=item.name,
+#     item_to_update.email=item.email,
+#     item_to_update.mob_numbeer=item.mob_numbeer,
+#     item_to_update.password=item.password
+
+#     db.commit()
+
+#     return item_to_update    
+
+
+
+
+# @app.delete('/item/{item_id}')
+# def delete_item(item_id:int):
+#     item_to_delete=db.query(models.Item).filter(models.Item.id==item_id).first()
+
+#     if item_to_delete is None:
+#         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail="Record is not Found")
     
-    db.delete(item_to_delete)
-    db.commit()
-    return item_to_delete
+#     db.delete(item_to_delete)
+#     db.commit()
+#     return item_to_delete
 
 
-
-# @app.get("/")
-# def index():
-#     return{"message":"Hello World"}
-
-# @app.get("/greet/{name}")
-# def greet_name(name:str):
-#     return{"greeting":f"Hello {name}"}
-
-# @app.get('/greet')
-# def greet_optional_name(name:Optional[str]="user"):
-#     return{"message":f"Hello{name}"}
-
-# @app.put("/item/{item_id}")
-# def update_item(item_id:int,item:Item):
-#     return{
-#         'name':item.name,
-#         'description':item.description,
-#         'price':item.price,
-#         'on_offer':item.on_offer,
-#     }
