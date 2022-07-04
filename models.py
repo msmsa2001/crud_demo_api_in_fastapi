@@ -9,6 +9,6 @@ class SignUp(Base):
     mobnumber=Column(VARCHAR(10),nullable=False)
     password=Column(String(10),nullable=False)
 
-    def __repr__(self):
-        return f"<Item name={self.name} price={self.email}>"
+    # def __repr__(self):
+    #     return f"<Item name={self.name} price={self.email}>"
     

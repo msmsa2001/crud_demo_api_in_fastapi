@@ -10,7 +10,7 @@ engine=create_engine("postgresql+psycopg2://postgres:ali123@localhost:5432/Emplo
 
 # engine=create_engine(f"{os.getenv('DB_NAME')}://)",echo=True)
 
+SessionLocal=sessionmaker(bind=engine)
 Base=declarative_base()
 
-SessionLocal=sessionmaker(bind=engine)
 

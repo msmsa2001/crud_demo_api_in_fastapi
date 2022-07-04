@@ -2,7 +2,7 @@ from pydantic import BaseModel
 from sqlalchemy import CHAR
 
 class SignUp(BaseModel):
-    id:int
+    
     name:str
     mobnumber:str
     email:str
