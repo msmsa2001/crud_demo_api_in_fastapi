@@ -14,11 +14,11 @@ db=SessionLocal()
 
 
 
-# @app.get('/user',response_model=List[schema.SignUp],status_code=200)
-# def get_all_user():
-#     user=db.query(models.SignUp).all()
+@app.get('/user',response_model=List[schema.SignUp],status_code=200)
+def get_all_user():
+    user=db.query(models.SignUp).all()
 
-#     return user
+    return user
 
 @app.get('/user/{occupation}/{add2}',response_model=List[schema.Employee],status_code=200)
 def get_employee(occupation:str,add2:str):
@@ -57,7 +57,7 @@ def register_an_user(user:schema.SignUp):
         db.commit()
         return JSONResponse(status_code=200, content={"message": "Registration Successful","code":"200"})
 
-    return new_user
+    
 
 
 @app.post('/login',response_model=schema.Login,status_code=status.HTTP_202_ACCEPTED)
@@ -75,6 +75,8 @@ def login_an_user(user:schema.Login):
                 "name":db_check.name,
                 "mobnumber":db_check.mobnumber,
                 "email":db_check.email,
+                "gender":db_check.gender,
+                "dob":db_check.dob
                 },
                 "error":"200"
                 }
@@ -88,17 +90,17 @@ def login_an_user(user:schema.Login):
 
 
 
-# @app.put('/item/{item_id}',response_model=schema.SignUp,status_code=status.HTTP_200_OK)
-# def update_an_item(item_id:int,item:schema.SignUp):
-#     item_to_update=db.query(models.SignUp).filter(models.SignUp.id==item_id).first()
-#     item_to_update.name=item.name,
-#     item_to_update.email=item.email,
-#     item_to_update.mobnumber=item.mobnumber,
-#     item_to_update.password=item.password
+@app.put('/update_user/{user_id}',response_model=schema.SignUp,status_code=status.HTTP_200_OK)
+def update_an_item(user_id:int,user:schema.SignUp):
+    item_to_update=db.query(models.SignUp).filter(models.SignUp.id==user_id).first()
+    item_to_update.name=user.name,
+    item_to_update.email=user.email,
+    item_to_update.mobnumber=user.mobnumber,
+    item_to_update.password=user.password
 
-#     db.commit()
+    db.commit()
 
-#     return item_to_update    
+    return item_to_update    
 
 
 
